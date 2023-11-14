@@ -16,10 +16,6 @@ RUN chown -R www-data:www-data /var/www/patreon
 
 RUN composer install --ignore-platform-reqs;
 
-RUN echo "#!/bin/sh\n" \
-  "php artisan storage:link\n" \
-  "php artisan migrate\n" > /var/www/patreon/start.sh
-
 RUN echo "* * * * * cd /var/www/patreon && /usr/local/bin/php artisan app:release-contents >> /var/log/cron.log 2>&1" > /etc/cron.d/laravel-scheduler
 
 # Give execution permission to the cron job
@@ -42,12 +38,5 @@ RUN chmod +x /etc/sv/php-fpm/run /etc/sv/cron/run
 RUN ln -s /etc/sv/php-fpm /etc/service/php-fpm
 RUN ln -s /etc/sv/cron /etc/service/cron
 
-# ... (Other Dockerfile instructions)
-
-RUN chmod +x /var/www/patreon/start.sh
-
 CMD ["runsvdir", "/etc/service"]
-
-
-
 

@@ -1,12 +1,13 @@
 version: "3.8"
 
 services:
-    fpm:
+    patreon-fpm:
         build:
             context: .
             dockerfile: docker/php-fpm.Dockerfile
         volumes:
             - ./:/var/www/patreon
+            - /var/www/patreon/vendor
         links:
             - patreon-mysql
     nginx:
@@ -18,7 +19,7 @@ services:
         ports:
             - "8050:80"
         links:
-            - fpm
+            - patreon-fpm
     patreon-mysql:
         image: mysql
         container_name: patreon-mysql

@@ -30,6 +30,12 @@ Run the application using Docker:
 docker-compose up -d
 ```
 
+Migrate the database
+
+```bash
+docker-compose exec patreon-fpm php artisan migrate
+```
+
 ## Usage
 
 Access the application by visiting http://localhost:8085/ in your web browser.
