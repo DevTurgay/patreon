@@ -3,7 +3,7 @@ FROM php:8.1-fpm
 RUN apt-get update && docker-php-ext-install pdo pdo_mysql
 
 # Install cron
-RUN apt-get update && apt-get -y install runit cron
+RUN apt-get update && apt-get -y install zip unzip runit cron
 
 COPY ./../ /var/www/patreon
 
@@ -12,12 +12,11 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www/patreon
 
-RUN composer install --ignore-platform-reqs;
-
 RUN chown -R www-data:www-data /var/www/patreon
 
+RUN composer install --ignore-platform-reqs;
+
 RUN echo "#!/bin/sh\n" \
-  "cron\n" \
   "php artisan storage:link\n" \
   "php artisan migrate\n" > /var/www/patreon/start.sh
 
