@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Events\ContentReleased;
 use App\Models\Content;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ReleaseContents extends Command
@@ -28,11 +30,28 @@ class ReleaseContents extends Command
     public function handle()
     {
         $contents = Content::where('is_released', 0)
-            ->where('release_date', '<=', now())
-            ->pluck('id')->toArray();
+            ->with('user')
+            ->where('release_date', '<=', now())->get();
 
-        Log::debug('Contents with following ids will be released: ' . implode(',', $contents));
+        $contentIds = $contents->pluck('id')->toArray();
+        if (empty($contentIds)) {
+            Log::debug('Nothing to release.');
+            return;
+        }
 
-        Content::whereIn('id', $contents)->update(['is_released' => 1]);
+        Log::debug('Contents with following ids will be released: ' . implode(',', $contents->pluck('id')->toArray()));
+
+        Content::whereIn('id', $contentIds)->update(['is_released' => 1]);
+
+        foreach ($contents as $content) {
+            $message = [
+                'message' => $content->user->name . " posted a new content!",
+                'contentId' => $content->id,
+                'userId' => $content->user_id
+            ];
+            event(new ContentReleased($message));
+        }
+
+        Cache::forget('contents');
     }
 }

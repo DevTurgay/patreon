@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('\App\Http\Controllers\Auth')->group(function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
     Route::post('login', 'LoginController@login')->name('login-post');
-    Route::post('logout', 'LoginController@logout')->name('logout');
+    Route::get('logout', 'LoginController@logout')->name('logout');
 
     // Registration Routes...
     Route::post('register', 'RegisterController@register')->name('register-post');
@@ -32,4 +32,6 @@ Route::namespace('\App\Http\Controllers\Auth')->group(function () {
 Route::middleware(['auth'])->namespace('\App\Http\Controllers')->group(function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::post('/content', 'ContentController@store')->name('content-post');
+    Route::get('/content/{content}', 'ContentController@show')->name('content-single');
+    Route::post('/notifications-read', 'NotificationsController@read')->name('notifications-read');
 });
